@@ -35,11 +35,11 @@ export class Blockchain{
         this.chain=chain;
     }
 }
-const blockchain=new Blockchain()
-blockchain.addBlock(['tst'])
-blockchain.addBlock(['ts1','xwc3i'])
-blockchain.addBlock(['ts21t'])
-blockchain.addBlock(['wcni[bcuwbcwu'])
+// const blockchain=new Blockchain()
+// blockchain.addBlock(['tst'])
+// blockchain.addBlock(['ts1','xwc3i'])
+// blockchain.addBlock(['ts21t'])
+// blockchain.addBlock(['wcni[bcuwbcwu'])
 
 
-console.log(blockchain.chain)
+// console.log(blockchain.chain)
