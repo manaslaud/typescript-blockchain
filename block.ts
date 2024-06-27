@@ -37,6 +37,7 @@ export class Block{
         const difference=Number(timestamp)- Number(originalBlock.timestamp);
         if(difficulty<1) return 1;
         if(difference>mine_rate) return difficulty-1;
+        if(difficulty<=0) return 1;
         return difficulty+1;
     }
 }

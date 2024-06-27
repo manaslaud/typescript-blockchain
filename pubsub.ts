@@ -1,43 +1,40 @@
-import { createClient } from "redis";
+const redis = require("redis");
 import { Blockchain } from "./blockchain";
-import { Block } from "./block";
 const CHANNELS = {
   TEST: "TEST",
-  PROD:'PROD'
+  BLOCKCHAIN: "BLOCKCHAIN",
 };
 export class PubSub {
   publisher;
-  subscriber;
-  blockchain
-  constructor(blockchain:Blockchain) {
-    this.publisher = createClient();
-    this.subscriber = createClient();
-    this.blockchain=blockchain;
+  subscriber
+  blockchain;
+  constructor( blockchain:Blockchain ) {
+    this.blockchain = blockchain;
+    this.publisher = redis.createClient();
+    this.subscriber = redis.createClient();
 
-    this.publisher.connect().then(() => {
-      console.log("Publisher connected");
-    }).catch((error) => {
-      console.error("Publisher connection error:", error);
-    });
+    this.subscriber.subscribe(CHANNELS.TEST);
+    this.subscriber.subscribe(CHANNELS.BLOCKCHAIN);
 
-    this.subscriber.connect().then(() => {
-      console.log("Subscriber connected");
-      this.subscriber.subscribe(CHANNELS.TEST, (message,channel)=>this.handleMessage(message,channel));
-    }).catch((error) => {
-      console.error("Subscriber connection error:", error);
-    });
+    this.subscriber.on("message", (channel:string, message:string) =>
+      this.handleMessage(channel, message)
+    );
   }
-  handleMessage(message:string,channel:string){
-    console.log(message)
-    const parseMessage:Block[]=JSON.parse(message)
-    if(channel==='PROD'){
-        this.blockchain.replaceChain(parseMessage)
+  handleMessage(channel:string, message:string) {
+    console.log(`Message recieved.Channel: ${channel} Message:${message}`);
+    const parseMessage = JSON.parse(message);
+
+    if (channel === CHANNELS.BLOCKCHAIN) {
+      this.blockchain.replaceChain(parseMessage);
     }
   }
-  publish(message:string,channel:string){
-    this.publisher.publish(message,channel)
+  publish(channel:string, message:string) {
+    this.publisher.publish(channel, message);
   }
-  broadcastChain(){
-    this.publish(JSON.stringify(this.blockchain.chain),CHANNELS.PROD)
+  broadcastChain() {
+    this.publish(
+     CHANNELS.BLOCKCHAIN,
+    JSON.stringify(this.blockchain.chain),
+    );
   }
 }

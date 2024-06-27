@@ -9,13 +9,18 @@ setTimeout(()=>{pubsub.broadcastChain()},1000)
 app.use(bodyParser.json())
 app.get('/api/getAllBlocks',(req,res)=>{
 res.json(blockchain.chain)
-console.log(req)
 })
 
 app.post('/api/mine',(req,res)=>{
 const {data}=req.body
 blockchain.addBlock(data);
+pubsub.broadcastChain();
 res.redirect('/api/getAllBlocks')
 })
 const PORT=3000;
-app.listen(PORT,()=>{console.log('listening on port : '+PORT)})
+if(process.env.GENERATE_PEER_PORT==='true'){
+    app.listen(3005,()=>{console.log('listening on port : '+3005)})
+}
+else{
+    app.listen(PORT,()=>{console.log('listening on port : '+PORT)})
+}
