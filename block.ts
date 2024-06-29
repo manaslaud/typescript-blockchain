@@ -28,16 +28,15 @@ export class Block{
             nonce++;
             timestamp=Date.now().toString();
             difficulty=Block.adjustDifficulty(prevBlock,timestamp)
-            hash=cryptoHash(timestamp,prevHash,data,nonce,difficulty)
+            hash=cryptoHash(timestamp,prevHash,...data,nonce,difficulty)
         }while(hexToBinary(hash).substring(0,difficulty)!=='0'.repeat(difficulty))
         return new this(timestamp,prevHash,hash,data,nonce,difficulty)
     }
     static adjustDifficulty(originalBlock:Block,timestamp:string):number{
         const {difficulty}=originalBlock;
         const difference=Number(timestamp)- Number(originalBlock.timestamp);
-        if(difficulty<1) return 1;
+        if(difficulty<1) return difficulty+1;
         if(difference>mine_rate) return difficulty-1;
-        if(difficulty<=0) return 1;
         return difficulty+1;
     }
 }
