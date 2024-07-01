@@ -21,7 +21,7 @@ blockchain.addBlock(data);
 pubsub.broadcastChain();
 res.redirect('/api/getAllBlocks')
 })
-const PORT=process.env.EXPRESS;
+const PORT=process.env.EXPRESS_PORT;
 if(process.env.GENERATE_PEER_PORT==='true'){
     app.listen(3005,()=>{console.log('listening on port : '+3005)})
 }

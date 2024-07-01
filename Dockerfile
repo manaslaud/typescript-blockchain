@@ -15,4 +15,4 @@ FROM node:16-alpine as prod
     RUN npm ci --only=production
     COPY --from=dev /usr/src/app/build ./build
     
-CMD ["node",build/index.js]
+CMD ["node","build/index.js"]
