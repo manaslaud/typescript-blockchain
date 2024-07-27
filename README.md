@@ -1,4 +1,4 @@
-# Blockchain and Rekindle Projects
+# Typescript Blockchain
 
 ## Table of Contents
 - [Overview](#overview)
