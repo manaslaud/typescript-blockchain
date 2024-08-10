@@ -10,16 +10,17 @@ export class Blockchain{
         this.chain.push(newBlock);
     }
     static isValidChain(chain:Block[]):boolean{
+        console.log('from first line of isVAlidChain: ', JSON.stringify(chain[0])!==JSON.stringify(Block.genesis()))
         if(JSON.stringify(chain[0])!==JSON.stringify(Block.genesis())) return false;
         for(let i=1;i<chain.length;i++){
             let {hash,prevHash,timestamp,data,nonce,difficulty}=chain[i];
             let lastDifficulty=chain[i-1].difficulty
             let realLastHash=chain[i-1].hash
             if(prevHash!==realLastHash) return false;
-
-            const validatedHash=cryptoHash(timestamp,prevHash,data,nonce,difficulty)
+            const validatedHash=cryptoHash(timestamp,prevHash,...data,nonce,difficulty)
+            console.log(hash,validatedHash)
             if(hash!==validatedHash) return false;
-            if(Math.abs(lastDifficulty-difficulty)>1) return false;
+            if (Math.abs(lastDifficulty - difficulty) > 1) return false;
         }
         return true;
     }

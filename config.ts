@@ -1,6 +1,6 @@
 import { Block } from "./block"
 export const difficulty=2;
-export const mine_rate=5500;
+export const mine_rate=1000;
 export const GENESIS:Block={
     timestamp:'1',
     prevHash:'0x000',

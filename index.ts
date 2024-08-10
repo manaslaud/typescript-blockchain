@@ -6,7 +6,6 @@ import dotenv from 'dotenv';
 
 dotenv.config();  
 const app=e();
-console.log(process.env.EXPRESS)
 const blockchain=new Blockchain();
 const pubsub=new PubSub(blockchain)
 setTimeout(()=>{pubsub.broadcastChain()},1000)

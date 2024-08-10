@@ -29,7 +29,7 @@ export class PubSub {
       port: redisPort,
      
     });
-
+    
     this.subscriber = redis.createClient({
       host: redisHost,
       port: redisPort,
