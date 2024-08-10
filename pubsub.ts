@@ -27,12 +27,15 @@ export class PubSub {
     this.publisher = redis.createClient({
       host: redisHost,
       port: redisPort,
+      password: process.env.REDIS_PASSWORD || '',
      
     });
-    
+
     this.subscriber = redis.createClient({
       host: redisHost,
       port: redisPort,
+      password: process.env.REDIS_PASSWORD || '',
+
     });
 
     this.subscriber.subscribe(CHANNELS.TEST);
