@@ -1,5 +1,5 @@
 const redis = require("redis");
-import { Blockchain } from "./blockchain";
+import { Blockchain } from "../blockchain";
 
 const CHANNELS = {
   TEST: "TEST",

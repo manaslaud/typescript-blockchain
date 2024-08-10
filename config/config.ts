@@ -1,4 +1,4 @@
-import { Block } from "./block"
+import { Block } from "../helpers/block"
 export const difficulty=2;
 export const mine_rate=1000;
 export const GENESIS:Block={

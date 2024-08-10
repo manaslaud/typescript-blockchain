@@ -1,4 +1,4 @@
-import { Block } from "./block"
+import { Block } from "./helpers/block"
 import { cryptoHash } from "./hash";
 export class Blockchain{
     chain:Block[];

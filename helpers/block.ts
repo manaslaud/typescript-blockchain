@@ -1,6 +1,6 @@
-import { GENESIS, mine_rate } from "./config";
+import { GENESIS, mine_rate } from "../config/config";
 import hexToBinary from "hex-to-binary";
-import { cryptoHash } from "./hash";
+import { cryptoHash } from "../hash";
 export class Block{
     timestamp:string;
     prevHash:string;
