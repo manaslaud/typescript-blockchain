@@ -1,7 +1,7 @@
 import { Blockchain } from "./blockchain";
 import e from "express";
 import bodyParser from "body-parser";
-import { PubSub } from "./helpers/pubsub";
+import { PubSub } from "./pubsub";
 import dotenv from 'dotenv'; 
 
 dotenv.config();  
