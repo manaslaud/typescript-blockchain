@@ -6,6 +6,8 @@
     "typescript": "^5.5.2"
   },
   "dependencies": {
+    "@noble/curves": "^1.6.0",
+    "@noble/secp256k1": "^2.1.0",
     "@types/express": "^4.17.21",
     "@types/mongodb": "^4.0.7",
     "@types/node": "^20.14.8",
