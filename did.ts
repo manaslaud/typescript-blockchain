@@ -8,9 +8,9 @@ class Did{
         this.method=method
         this.methodSpecificId=methodSpecificId
     }
-    static createDid(pkey:PublicKey){
-        const pkHash:string=cryptoHash(pkey.id,pkey.publicKey)
-        const did= new Did('did','csi',pkHash)
+    static createMid(pkey:PublicKey){
+        const Mid:string=cryptoHash(pkey.id,pkey.publicKey)
+        return Mid
     }
 }
 class PublicKey {
