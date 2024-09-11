@@ -2,3 +2,5 @@ node_modules
 build
 avgtime.ts
 .env
+testScript.ts
+testScript.js
