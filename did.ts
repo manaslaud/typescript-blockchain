@@ -1,4 +1,6 @@
-import { cryptoHash } from "./hash"                                 
+import { sign } from "crypto";
+import { cryptoHash } from "./hash"
+import { Signature } from '@noble/secp256k1';
 class Did{
     scheme:string
     method:string
@@ -70,4 +72,17 @@ class DidDocument {
         this.updatedAt = updatedAt;
     }
     
+}
+
+export class Transaction{
+    signature:Signature
+    createdAt:Date
+    did?:Did
+    createdBy:string
+    constructor(signature:Signature,createdBy:string,createdAt:Date,did?:Did){
+        this.signature=signature
+        this.createdAt=createdAt
+        this.createdBy=createdBy
+        this.did=this.did
+    }
 }
