@@ -40,7 +40,7 @@ export const createDidDocumentController = async (req: Request, res: Response) =
         const secp256k1 = await importNoble();
         if (!secp256k1) {
             console.error('Failed to import secp256k1');
-            return res.status(500).send(new Error('Error importing @noble/curves/secp256k1'));
+            return res.status(500).json({message:'Error importing @noble/curves/secp256k1'});
         }
         const signature: Signature = {
             r: String(signatureR),

@@ -1,4 +1,5 @@
 version: '3.8'
+
 services:
   blockchain:
     build:
@@ -7,20 +8,26 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy  # Ensure Redis is healthy before starting
     environment:
       - NODE_ENV=production
-      - EXPRESS_PORT=3000
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_PASSWORD=enterPassword
+      - EXPRESS_PORT=${EXPRESS_PORT:-3000}  # Set default value for EXPRESS_PORT
+      - REDIS_HOST=redis     # Use container name 'redis' as default
+      - REDIS_PORT=${REDIS_PORT:-6379}      # Default port for Redis
+      - DB_URI=${DB_URI}                    # Ensure DB_URI is provided externally
     networks:
       - blockchain-network
 
   redis:
     image: "redis:alpine"
     ports:
-      - "6379:6379"
+      - "6379:6379"  # Expose Redis port if needed
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     networks:
       - blockchain-network
 
