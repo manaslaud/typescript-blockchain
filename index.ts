@@ -1,35 +1,50 @@
-import { Blockchain } from "./blockchain";
-import e from "express";
-import bodyParser from "body-parser";
-import { Db } from "mongodb";
-import { PubSub } from "./pubsub";
-import dotenv from 'dotenv'; 
-import { connectToDatabase } from "./db";
-async function main(){
-    dotenv.config();  
-    const app=e();
-    const blockchain=new Blockchain();
-    const pubsub=new PubSub(blockchain)
-    const db:Db=await connectToDatabase()
-    setTimeout(()=>{pubsub.broadcastChain()},1000)
-    app.use(bodyParser.json())
-    app.get('/api/getAllBlocks',(req,res)=>{
-    res.json(blockchain.chain)
-    })
-    
-    app.post('/api/mine',(req,res)=>{
-    const {data}=req.body
-    blockchain.addBlock(data);
-    pubsub.broadcastChain();
-    res.redirect('/api/getAllBlocks')
-    })
-    const PORT=process.env.EXPRESS_PORT;
-    if(process.env.GENERATE_PEER_PORT==='true'){
-        app.listen(3005,()=>{console.log('listening on port : '+3005)})
+import express from 'express';
+import bodyParser from 'body-parser';
+import dotenv from 'dotenv';
+import apiRoutes from './api/routes';
+import { Blockchain } from './blockchain';
+import { connectToDatabase } from './db';
+import { PubSub } from './pubsub';
+import { Db } from 'mongodb';
+import { CHANNELS } from './pubsub';
+dotenv.config();
+
+export const blockchain:Blockchain = new Blockchain();
+export const pubSub:PubSub=new PubSub(blockchain)
+pubSub.requestChain();
+pubSub.subscriber.on('message', (channel:string, message:string) => {
+    if (channel === CHANNELS.RESPONSE_CHAIN) {
+      const receivedChain = JSON.parse(message);
+      blockchain.replaceChain(receivedChain);
     }
-    else{
-        app.listen(PORT,()=>{console.log('listening on port : '+PORT)})
+  });
+let db: Db;
+
+async function main() {
+    const app = express();
+
+    try {
+        db = await connectToDatabase();
+    } catch (error) {
+        console.error("Failed to connect to database:", error);
+        process.exit(1);
     }
-    
+
+    app.use(bodyParser.json());
+    app.use('/api', apiRoutes);
+
+    const PORT = process.env.EXPRESS_PORT || 3000;
+    if (process.env.GENERATE_PEER_PORT === 'true') {
+        app.listen(3005, () => {
+            console.log('Listening on port 3005');
+        });
+    } else {
+        app.listen(PORT, () => {
+            console.log(`Listening on port ${PORT}`);
+        });
+    }
 }
-main()
+
+main();
+
+export { db };

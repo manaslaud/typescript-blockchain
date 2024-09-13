@@ -1,9 +1,11 @@
-const redis = require("redis");
 import { Blockchain } from "./blockchain";
 
-const CHANNELS = {
+const redis = require("redis");
+export const CHANNELS = {
   TEST: "TEST",
   BLOCKCHAIN: "BLOCKCHAIN",
+  REQUEST_CHAIN: "REQUEST_CHAIN",
+  RESPONSE_CHAIN: "RESPONSE_CHAIN",
 };
 
 export class PubSub {
@@ -14,48 +16,50 @@ export class PubSub {
   constructor(blockchain: Blockchain) {
     this.blockchain = blockchain;
 
-    // Use environment variables to configure Redis connection
     const redisHost = process.env.REDIS_HOST || 'localhost';
-    let redisPort;
-    if(process.env.REDIS_PORT){
-       redisPort = parseInt(process.env.REDIS_PORT, 10);
-    }
-    else{
-       redisPort=6379;
-    }
+    const redisPort = process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT, 10) : 6379;
 
     this.publisher = redis.createClient({
       host: redisHost,
       port: redisPort,
-      password: process.env.REDIS_PASSWORD || '',
-     
     });
 
     this.subscriber = redis.createClient({
       host: redisHost,
       port: redisPort,
-      password: process.env.REDIS_PASSWORD || '',
-
     });
 
-    this.subscriber.subscribe(CHANNELS.TEST);
-    this.subscriber.subscribe(CHANNELS.BLOCKCHAIN);
+    // Handle errors
+    this.publisher.on('error', (err:any) => {
+      console.error('Redis Publisher Error:', err);
+    });
 
-    this.subscriber.on("message", (channel: string, message: string) =>
-      this.handleMessage(channel, message)
-    );
+    this.subscriber.on('error', (err:any) => {
+      console.error('Redis Subscriber Error:', err);
+    });
+
+    // Set up subscriptions
+    this.subscriber.on('connect', () => {
+      console.log('Connected to Redis Subscriber');
+      this.subscriber.subscribe(CHANNELS.BLOCKCHAIN);
+      this.subscriber.subscribe(CHANNELS.REQUEST_CHAIN);
+    });
+
+    this.subscriber.on('message', (channel:string, message:string) => {
+      console.log(`Received message from ${channel}: ${message}`);
+      if (channel === CHANNELS.BLOCKCHAIN) {
+        const receivedChain = JSON.parse(message);
+        this.blockchain.replaceChain(receivedChain);
+      } else if (channel === CHANNELS.REQUEST_CHAIN) {
+        this.handleChainRequest(message);
+      }
+    });
+
+    // Broadcast the current chain when this node starts
+    this.broadcastChain();
   }
 
-  handleMessage(channel: string, message: string) {
-    console.log(`Message received. Channel: ${channel} Message: ${message}`);
-    const parseMessage = JSON.parse(message);
-
-    if (channel === CHANNELS.BLOCKCHAIN) {
-      this.blockchain.replaceChain(parseMessage);
-    }
-  }
-
-  publish(channel: string, message: string) {
+  publish(channel:string, message:string) {
     this.publisher.publish(channel, message);
   }
 
@@ -63,6 +67,23 @@ export class PubSub {
     this.publish(
       CHANNELS.BLOCKCHAIN,
       JSON.stringify(this.blockchain.chain)
+    );
+  }
+
+  handleChainRequest(message:string) {
+    const request = JSON.parse(message);
+    if (request.type === "GET_CHAIN") {
+      this.publish(
+        CHANNELS.RESPONSE_CHAIN,
+        JSON.stringify(this.blockchain.chain)
+      );
+    }
+  }
+
+  requestChain() {
+    this.publish(
+      CHANNELS.REQUEST_CHAIN,
+      JSON.stringify({ type: "GET_CHAIN" })
     );
   }
 }
