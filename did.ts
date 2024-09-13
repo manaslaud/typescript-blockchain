@@ -1,7 +1,6 @@
 import { sign } from "crypto";
 import { cryptoHash } from "./hash"
-import { Signature } from '@noble/secp256k1';
-class Did{
+export class Did{
     scheme:string
     method:string
     methodSpecificId:string
@@ -11,78 +10,85 @@ class Did{
         this.methodSpecificId=methodSpecificId
     }
     static createMid(pkey:PublicKey){
-        const Mid:string=cryptoHash(pkey.id,pkey.publicKey)
+        const Mid:string=cryptoHash(pkey.publicKey)
         return Mid
     }
 }
-class PublicKey {
-    id: string;
+export class PublicKey {
     type: string;
     publicKey: string;
 
-    constructor(id: string, type: string, publicKey: string) {
-        this.id = id;
+    constructor(type: string, publicKey: string) {
         this.type = type;
         this.publicKey = publicKey;
     }
 }
-class Authentication {
-    type: string;
-    publicKey: PublicKey;
+// export class Authentication {
+//     type: string;
+//     publicKey: PublicKey;
 
-    constructor(type: string, publicKey: PublicKey) {
-        this.type = type;
-        this.publicKey = publicKey;
-    }
-}
-class ServiceEndpoint {
-    id: string;
-    type: string;
-    serviceURL: string;
+//     constructor(type: string, publicKey: PublicKey) {
+//         this.type = type;
+//         this.publicKey = publicKey;
+//     }
+// }
+// export class ServiceEndpoint {
+//     id: string;
+//     type: string;
+//     serviceURL: string;
 
-    constructor(id: string, type: string, serviceURL: string) {
-        this.id = id;
-        this.type = type;
-        this.serviceURL = serviceURL;
-    }
-}
+//     constructor(id: string, type: string, serviceURL: string) {
+//         this.id = id;
+//         this.type = type;
+//         this.serviceURL = serviceURL;
+//     }
+// }
 
 
-class DidDocument {
+export class DidDocument {
     did: Did;
     publicKey: PublicKey;
-    authentication: Authentication;
-    services: ServiceEndpoint[];
+    // authentication: Authentication;
+    // services?: ServiceEndpoint[];
     createdAt: Date;
-    updatedAt: Date;
+    isValid:boolean
 
     constructor(
         did: Did,
         publicKey: PublicKey,
-        authentication: Authentication,
-        services: ServiceEndpoint[],
+        // authentication: Authentication,
         createdAt: Date,
-        updatedAt: Date
+        isValid:boolean
+        // services?: ServiceEndpoint[]
     ) {
         this.did = did;
         this.publicKey = publicKey;
-        this.authentication = authentication;
-        this.services = services;
+        this.isValid=isValid
+        // this.authentication = authentication;
+        // this.services = services;
         this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
     
 }
-
+export class Signature{
+    r:string
+    s:string
+    constructor(r:string,s:string){
+        this.r=r
+        this.s=s
+    }
+}
 export class Transaction{
     signature:Signature
     createdAt:Date
-    did?:Did
+    did:Did|null
+    publicKey:string
     createdBy:string
-    constructor(signature:Signature,createdBy:string,createdAt:Date,did?:Did){
+    constructor(signature:Signature,createdBy:string,createdAt:Date,publicKey:string,did:Did|null){
         this.signature=signature
         this.createdAt=createdAt
+        this.publicKey=publicKey
         this.createdBy=createdBy
-        this.did=this.did
+        this.did=did || null
     }
 }
